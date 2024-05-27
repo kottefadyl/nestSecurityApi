@@ -9,11 +9,11 @@ import { Users } from './auth/entities/user.entity';
   imports: [
     TypeOrmModule.forRoot({
       type: 'mysql',
-      host: 'mysql-pegazus-35.alwaysdata.net',
+      host: 'mysql-uranus.alwaysdata.net',
         port: 3306,
-      username: '359525',
+      username: 'uranus',
       password: 'trentejuin3006@',
-      database: 'pegazus-16_commun',
+      database: 'uranus_44',
       entities: [Users],
       synchronize: true,
     }),
