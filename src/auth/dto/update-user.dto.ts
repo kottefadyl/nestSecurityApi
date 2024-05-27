@@ -3,9 +3,6 @@ import { SignUp } from './signup.dto';
 import { IsOptional, IsString, IsNumber, IsEmail, IsEnum } from 'class-validator';
 
 export class UpdateUserDto extends PartialType(SignUp) {
-    @IsOptional()
-    @IsString()
-    matUser?: string;
   
     @IsOptional()
     @IsString()
@@ -22,14 +19,6 @@ export class UpdateUserDto extends PartialType(SignUp) {
     @IsOptional()
     @IsEmail()
     emailUser?: string;
-  
-    @IsOptional()
-    @IsString()
-    password?: string;
-  
-    @IsOptional()
-    @IsEnum(['1', '2', '3'])
-    profilUser?: string;
   
     @IsOptional()
     @IsEnum(['-1', '0', '1'])

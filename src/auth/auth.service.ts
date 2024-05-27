@@ -10,8 +10,6 @@ import { Request } from 'express';
 import generateUniqueUserID from './generateUniqueUserID';
 import * as bcrypt from 'bcryptjs'
 
-
-
 @Injectable()
 export class AuthService {
   constructor(
@@ -40,7 +38,7 @@ export class AuthService {
 
   async login(user: SignUp) : Promise<{ user : Users; token: string} | any> {
     const {nomUser, password, emailUser} = user
-    const trueUser = await this.userRepository.findOne({where : {emailUser}})
+    const trueUser = await this.userRepository.findOne({where : {emailUser : emailUser}})
 
     if(!trueUser){
       return{
@@ -71,7 +69,7 @@ export class AuthService {
     if (!id) {
       throw new Error('ID is required'); // Gérer le cas où aucun ID n'est fourni
     }
-    return await this.userRepository.findOne({where:{id}});
+    return await this.userRepository.findOne({where:{id: id}});
   }
 
   update(id: number, updateUserDto: UpdateUserDto) {
@@ -84,25 +82,35 @@ export class AuthService {
 
   async validateUser(token: string) : Promise<any>{
       console.log(token);
+      console.log('requette recu');
+
       try {
         const payload = await this.jwtService.verifyAsync(token, {
           secret: jwtConstants.secret,
         });
-        const user = await this.userRepository.findOne({ where: payload.sub})
+        const user = await this.userRepository.findOne({ where: { id: payload.sub }});
         console.log(payload);
+        console.log(user);
+        
         if (!user) {
           return {
             status: false,
             msg: "cette utilisateur n'existe pas "
           }
         } else {
-          console.log("utilisateur ici", user);
+          // console.log("utilisateur ici", user);
           return {
             status: true,
-            msg:'utilisateur en regle'
+            msg:'utilisateur en regle',
+            userId: user.id,
+            userRole : user.profilUser
           }
         }
       } catch (error) {
+        return {
+          status: false,
+          msg:'token invalide'
+        }
         console.log(error);
         throw new UnauthorizedException(error);
     } 
@@ -124,8 +132,8 @@ export class AuthService {
         msg: "vous n'avez pas d'autorisation"
       }
     }
-    const usersAd = await this.userRepository.findOne({where : {id}})
-    console.log('utilisateur : ',usersAd);
+    const usersAd = await this.userRepository.findOne({where : {id :id}})
+    console.log('utilisateur : ', usersAd);
     if (usersAd.profilUser !== "3") {
       return {
         msg: "vous n'avez pas cette autorisation sur un compte non administrateur"
@@ -134,9 +142,7 @@ export class AuthService {
     mem.profilUser = "2";
     mem.createUserAt = id;
     mem.matMemb = generateUniqueUserID();
-    // console.log("nouceau : ", mem);
-    
-    // console.log("matric", mem.matMemb);
+
     const newUser = await this.userRepository.create(mem);
     const savedUser = await this.userRepository.save(newUser);
     return {
@@ -154,7 +160,6 @@ export class AuthService {
       return undefined
     }
     console.log(req.headers);
-    
     const token = this.extractTokenFromHeader(req);
     if (!token) {
       return undefined
