@@ -20,19 +20,22 @@ export class AuthService {
 
   async singUp(userDto: SignUp): Promise<{ user: Users; token: string }> {
     userDto.profilUser = "1";
-    const hashedPassword = await bcrypt.hash(userDto.password, 10)
-    userDto.password = hashedPassword
+    const hashedPassword = await bcrypt.hash(userDto.password, 10);
+    userDto.password = hashedPassword;
+    userDto.dateCreateAt = new Date()
     console.log(userDto);
+    userDto.matMemb = generateUniqueUserID()
     
+     if ( !userDto.nomUser ||  !userDto.password || !userDto.emailUser || !userDto.password) {
+        throw new Error('all parameter is missing name, password ,email');
+     }
+
     const newUser = await this.userRepository.create(userDto);
     const savedUser = await this.userRepository.save(newUser);
-    
-    
     const payload = { sub: savedUser.id, emailUser: savedUser.emailUser };
     const token = await this.jwtService.signAsync(payload)
     console.log(payload);
     console.log(token);
-
     return { user: savedUser, token };
   }
 

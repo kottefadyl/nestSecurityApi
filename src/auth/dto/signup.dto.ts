@@ -40,6 +40,9 @@ export class SignUp {
 
   @IsOptional()
   updateUserAt?: number;
+
+  @IsOptional()
+  dateCreateAt?: Date;
 }
 
 
